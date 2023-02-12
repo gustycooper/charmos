@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="{{ url_for('static', filename='css/reset.css') }}" rel="stylesheet"/>
+        <link href="{{ url_for('static', filename='css/themes.css') }}" rel="stylesheet"/>
+        <link href="{{ url_for('static', filename='css/filepicker.css') }}" rel="stylesheet"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="{{ url_for('static', filename='scripts/filepick.js') }}"></script>
+        <title>Chemu Web Interface | Choose Files</title>
+    </head>
+    <body>
+        <h1>
+            Welcome to Chemu!
+        </h1>
+        <h2>
+            Please choose a .o file to run.
+        </h2>
+        <div>
+            <form name="files" action="/init" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+                <p>
+                    <h2>Input file:</h2>
+                    <input type="file" id="input-file-picker" name="input-file" accept=".o">
+                </p>
+                <p>
+                    <h2>OS file:</h2>
+                    <div>
+                        <input type="radio" name="os-choice" id="no-os" value="none" onclick="onChooseOSDeselected()" checked>
+                        <label for="no-os">None</label>
+                    </div>
+                    <div>
+                        <input type="radio" name="os-choice" id="default-os" value="default" onclick="onChooseOSDeselected()">
+                        <label for="default-os">Default OS</label>
+                    </div>
+                    <div>
+                        <input type="radio" name="os-choice" id="pick-os" value="user" onclick="onChooseOSSelected()">
+                        <label for="pick-os">Choose file:</label>
+                        <input type="file" id="os-file-picker" name="os-file" accept=".o" disabled>
+                    </div>
+                    <!-- <div class="inline-div">
+                        <span>Load OS</span>
+                        <input type="checkbox" id="use-os-checkbox">
+                    </div> -->
+
+                </p>
+                <input type="submit" value="Run">
+            </form>
+        </div>
+    </body>
+</html>

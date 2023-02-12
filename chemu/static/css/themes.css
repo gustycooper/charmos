@@ -1,0 +1,42 @@
+:root { 
+    --page-background-color: #111;
+  
+    --font-color: white;
+  
+    --footer-font-color: #8DC9F7;
+    --footer-link-color: white;
+    
+    --darkest: #002D61;
+    --mid: #0067A2;
+    --light: #8DC9F7;
+    
+    --button-hover-color: #004c79;
+    --button-press-color: #002D61;
+    
+    --console-border: #4A5156;
+    --console-background: black;
+    --console-background-top: rgb(20, 20, 20);
+    
+    --highlight: #F7BF0A;
+}
+
+:root.dark {
+    --page-background-color: #111;
+
+    --font-color: white;
+    --footer-font-color: #999999;
+    --footer-link-color: white;
+
+    --darkest: #1a1a1a;
+    --mid: #333;
+    --light: #bfbfbf;
+
+    --button-hover-color: #4d4d4d;
+    --button-press-color: #262626;
+
+    --console-border: #4A5156;
+    --console-background: black;
+    --console-background-top: rgb(20, 20, 20);
+
+    --highlight: #ffb380;
+}

@@ -1,0 +1,320 @@
+/**
+Note that this is a sass CSS file; use "sass home.scss home.css" to build home.css
+
+The colors below are inserted into the .css file.
+This will make theming/color tweaks easier
+**/
+
+@font-face {
+    font-family: Cousine;
+    src: url(/static/fonts/Cousine-Regular.ttf);
+}
+
+@font-face {
+    font-family: Heebo;
+    src: url(/static/fonts/Heebo-Thin.ttf);
+}
+
+@font-face {
+    font-family: Urbanist;
+    src: url(/static/fonts/Urbanist-Medium.ttf)
+}
+
+html {
+    background-color: var(--page-background-color);
+    font-family: Cousine;
+    height: 100%;
+}
+
+body {
+    color: var(--font-color);
+
+    padding-top: 1vw;
+    margin: 1vw;
+    background-image: linear-gradient(var(--darkest), var(--mid));
+    border-radius: 5px;
+    border: 1px solid var(--mid);
+    box-shadow: 0px 4px 8px black;
+}
+
+.highlight {
+    color: var(--highlight);
+}
+
+h1, h2, h3 {
+    font-family: Heebo;
+    font-weight: normal;
+}
+
+h2 {
+    font-size: 1.25vw;
+}
+
+#console-container {
+    background-color: var(--console-background);
+    background-image: linear-gradient(var(--console-background-top), var(--console-background) 20%);
+    border-color: var(--console-border);
+}
+
+#table-wrapper {
+    overflow-y: auto;
+    height: 21.5vw;
+}
+
+#table-wrapper::-webkit-scrollbar, #message-window table::-webkit-scrollbar {
+    background-color: var(--console-background);
+    width: .3vw;
+}
+
+#table-wrapper::-webkit-scrollbar-thumb, #message-window table::-webkit-scrollbar-thumb {
+    background: var(--console-border);
+}
+
+.input-container {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--console-border);
+    border-radius: 5px;
+    width: 100%;
+    margin-top: .5vw;
+}
+
+.border-highlight {
+    outline: solid 1px white;
+}
+
+.input-decoration {
+    color: var(--font-color);
+    font-size: 1.2vw;
+}
+
+#user-input {
+    background-color: var(--console-background);
+    border: none;
+    color: var(--font-color);
+    flex: 2;
+}
+
+#user-input:focus {
+    outline: none;
+}
+
+header > h1 {
+    text-align: center;
+    font-size: 2.5vw;
+    font-family: Urbanist;
+    text-shadow: 0px 4px 8px black;
+}
+
+main {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-around;
+    margin-top: 1.2vw;
+}
+
+main > section {
+    width: 30%;
+    border: 1px solid var(--light);
+    border-radius: 5px;
+    padding: 0.75vw;
+    box-shadow: 0px 4px 8px black;
+    height: 30vw;
+}
+
+#current-instruction-row, .active {
+    color: var(--highlight);
+    text-shadow: 0px 0px 4px black;
+}
+
+h2 {
+    text-align: center;
+}
+
+main input, main button {
+    width: 45%;
+    font-family: Cousine;
+    font-size: 1.2vw;
+    padding: 0.3vw;
+}
+
+#registers-col {
+    width: 1px;
+}
+
+#registers-int-col, #registers-float-col {
+    width: 25%;
+}
+
+#registers-table tr > td:nth-of-type(1) {
+    color: var(--light);
+    text-align: right;
+}
+
+#registers-table tr > td:nth-of-type(2) {
+    padding-left: 0.5vw;
+}
+#registers-table tr > td:nth-of-type(3),
+#registers-table tr > td:nth-of-type(4) {
+    text-align: center;
+}
+
+#instruction-address-col {
+    width: 1px;
+}
+
+#instruction-table tr > td:nth-of-type(1) {
+    color: var(--light);
+}
+
+#instruction-table tr > td:nth-of-type(2) {
+    padding-left: 1vw;
+}
+
+#step-button {
+    background-color: var(--mid);
+    color: var(--font-color);
+    border: 1px solid var(--light);
+}
+
+#step-button:hover {
+    background-color: var(--button-hover-color);
+}
+
+#step-button:active {
+    background-color: var(--button-press-color);
+}
+
+#step-over-button {
+    background-color: var(--mid);
+    color: var(--font-color);
+    border: 1px solid var(--light);
+}
+
+#step-over-button:hover {
+    background-color: var(--button-hover-color);
+}
+
+#step-over-button:active {
+    background-color: var(--button-press-color);
+}
+
+#current-instruction {
+    font-weight: bold;
+}
+
+main table {
+    width: 100%;
+}
+
+main td {
+    font-size: 1.1vw;
+}
+
+footer {
+    padding: 1vw;
+    line-height: 2;
+}
+
+footer > p {
+    color: var(--footer-font-color);
+    text-align: center;
+    font-size: 0.8vw;
+}
+
+footer > p > a {
+    color: var(--footer-link-color);
+}
+
+.dump-window {
+    z-index: 1;
+    position: fixed;
+    
+    background-image: linear-gradient(var(--console-background-top), var(--console-background));
+    border-radius: 5px;
+    border: 1px solid var(--console-border);
+    box-shadow: 0px 4px 8px black;
+    padding: 1vw;
+    left: 24vw;
+    top: 10vw;
+    cursor: move;
+    display: none;
+}
+
+.dump-window table {
+    width: 50vw;
+}
+
+#l-window table {
+    width: 30vw;
+}
+
+#message-window table {
+    width: 30vw;
+    max-height: 35vh;
+    overflow-y: scroll;
+    display: block;
+}
+
+#dump-hide-button, #l-dump-hide-button, #messages-hide-button {
+    color: var(--console-border);
+    position: absolute;
+}
+
+#dump-hide-button:hover, #l-dump-hide-button:hover, #messages-hide-button:hover {
+    color: var(--font-color);
+    text-decoration: none;
+}
+
+.or {
+    text-align: center;
+    font-size: 1.2vw;
+}
+
+#theme-picker {
+    position: absolute;
+    float: left;
+    display: flex;
+    justify-content: flex-start;
+    padding-left: 1vw;
+    z-index: 2;
+}
+
+.theme-option {
+    display: inline-block;
+    border-radius: 50%;
+    width: 2.0vw;
+    height: 2.0vw;
+    border: 1px solid black;
+    margin-right: 0.5vw;
+    cursor: pointer;
+}
+
+.theme-option:hover {
+    filter: brightness(150%);
+}
+
+#umw-theme {
+    color: white;
+    background-color: #002D61;
+    border-color: #0067A2;
+}
+
+#dark-theme {
+    color: white;
+    background-color: #1a1a1a;
+    border-color: #333;
+}
+
+#reset-button-container {
+    display: block;
+    text-align: right;
+    position: absolute;
+    left: 0;
+    right: 2.0vw;
+}
+
+#reset-button {
+    display: inline;
+    width: 3vw;
+}

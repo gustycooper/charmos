@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html class="umw">
+    <head>
+        <title>Chemu Web Interface</title>
+        <link href="{{ url_for('static', filename='css/reset.css') }}" rel="stylesheet"/>
+        <link href="{{ url_for('static', filename='css/themes.css') }}" rel="stylesheet"/>
+        <link id="theme" href="{{ url_for('static', filename='css/home.css') }}" rel="stylesheet"/>
+        
+        <script type='text/javascript' src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script type='text/javascript' src="{{ url_for('static', filename='scripts/main.js') }}"></script>
+        <script type='text/javascript' src="{{ url_for('static', filename='scripts/activestyle.js') }}"></script>
+    </head>
+    <body>
+        <div id="message-window" class="dump-window">
+            <div id="hide-button-container">
+                <a href="#" id="messages-hide-button" onclick="hideMessagesWindow()">&times;</a>
+            </div>
+            <h2>Messages</h2>
+            <table>
+                <tbody id="message-table">
+                    
+                </tbody>
+            </table>
+        </div>
+        <div id="dump-window" class="dump-window">
+            <div id="hide-button-container">
+                <a href="#" id="dump-hide-button" onclick="hideDumpWindow()">&times;</a>
+            </div>
+            <h2>Memory Dump</h2>
+            <table>
+                <thead>
+                    <th>Address</th>
+                    <th>+0x0</th>
+                    <th>+0x4</th>
+                    <th>+0x8</th>
+                    <th>+0xC</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="dump-addr0">0x----</td>
+                        <td id="dump-value0-0">0x--------</td>
+                        <td id="dump-value0-1">0x--------</td>
+                        <td id="dump-value0-2">0x--------</td>
+                        <td id="dump-value0-3">0x--------</td>
+                    </tr>
+                    <tr>
+                        <td id="dump-addr1">0x----</td>
+                        <td id="dump-value1-0">0x--------</td>
+                        <td id="dump-value1-1">0x--------</td>
+                        <td id="dump-value1-2">0x--------</td>
+                        <td id="dump-value1-3">0x--------</td>
+                    </tr>
+                    <tr>
+                        <td id="dump-addr2">0x----</td>
+                        <td id="dump-value2-0">0x--------</td>
+                        <td id="dump-value2-1">0x--------</td>
+                        <td id="dump-value2-2">0x--------</td>
+                        <td id="dump-value2-3">0x--------</td>
+                    </tr>
+                    <tr>
+                        <td id="dump-addr3">0x----</td>
+                        <td id="dump-value3-0">0x--------</td>
+                        <td id="dump-value3-1">0x--------</td>
+                        <td id="dump-value3-2">0x--------</td>
+                        <td id="dump-value3-3">0x--------</td>
+                    </tr>
+                    <tr>
+                        <td id="dump-addr4">0x----</td>
+                        <td id="dump-value4-0">0x--------</td>
+                        <td id="dump-value4-1">0x--------</td>
+                        <td id="dump-value4-2">0x--------</td>
+                        <td id="dump-value4-3">0x--------</td>
+                    </tr>
+                    <tr>
+                        <td id="dump-addr5">0x----</td>
+                        <td id="dump-value5-0">0x--------</td>
+                        <td id="dump-value5-1">0x--------</td>
+                        <td id="dump-value5-2">0x--------</td>
+                        <td id="dump-value5-3">0x--------</td>
+                    </tr>
+                    <tr>
+                        <td id="dump-addr6">0x----</td>
+                        <td id="dump-value6-0">0x--------</td>
+                        <td id="dump-value6-1">0x--------</td>
+                        <td id="dump-value6-2">0x--------</td>
+                        <td id="dump-value6-3">0x--------</td>
+                    </tr>
+                    <tr>
+                        <td id="dump-addr7">0x----</td>
+                        <td id="dump-value7-0">0x--------</td>
+                        <td id="dump-value7-1">0x--------</td>
+                        <td id="dump-value7-2">0x--------</td>
+                        <td id="dump-value7-3">0x--------</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="l-window" class="dump-window">
+            <div id="l-hide-button-container">
+                <a href="#" id="l-dump-hide-button" onclick="hideLDumpWindow()">&times;</a>
+            </div>
+            <h2>Instruction Dump</h2>
+            <table>
+                <thead>
+                    <th>Address</th>
+                    <th>Instruction</th>
+                    <th>Hex</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="l-addr0">0x--------</td>
+                        <td id="l-instr0">str r0, [r13, #8]</td>
+                        <td id="l-hex0">0x--------</td>
+                    </tr>
+                    <tr>
+                        <td id="l-addr1">0x--------</td>
+                        <td id="l-instr1">str r0, [r13, #8]</td>
+                        <td id="l-hex1">0x--------</td>
+                    </tr>
+                    <tr>
+                        <td id="l-addr2">0x--------</td>
+                        <td id="l-instr2">str r0, [r13, #8]</td>
+                        <td id="l-hex2">0x--------</td>
+                    </tr>
+                    <tr>
+                        <td id="l-addr3">0x--------</td>
+                        <td id="l-instr3">str r0, [r13, #8]</td>
+                        <td id="l-hex3">0x--------</td>
+                    </tr>
+                    <tr>
+                        <td id="l-addr4">0x--------</td>
+                        <td id="l-instr4">str r0, [r13, #8]</td>
+                        <td id="l-hex4">0x--------</td>
+                    </tr>
+                    <tr>
+                        <td id="l-addr5">0x--------</td>
+                        <td id="l-instr5">str r0, [r13, #8]</td>
+                        <td id="l-hex5">0x--------</td>
+                    </tr>
+                    <tr>
+                        <td id="l-addr6">0x--------</td>
+                        <td id="l-instr6">str r0, [r13, #8]</td>
+                        <td id="l-hex6">0x--------</td>
+                    </tr>
+                    <tr>
+                        <td id="l-addr7">0x--------</td>
+                        <td id="l-instr7">str r0, [r13, #8]</td>
+                        <td id="l-hex7">0x--------</td>
+                    </tr>
+                    <tr>
+                        <td id="l-addr8">0x--------</td>
+                        <td id="l-instr8">str r0, [r13, #8]</td>
+                        <td id="l-hex8">0x--------</td>
+                    </tr>
+                    <tr>
+                        <td id="l-addr9">0x--------</td>
+                        <td id="l-instr9">str r0, [r13, #8]</td>
+                        <td id="l-hex9">0x--------</td>
+                    </tr>
+                    <tr>
+                        <td id="l-addr10">0x--------</td>
+                        <td id="l-instr10">str r0, [r13, #8]</td>
+                        <td id="l-hex10">0x--------</td>
+                    </tr>
+                    <tr>
+                        <td id="l-addr11">0x--------</td>
+                        <td id="l-instr11">str r0, [r13, #8]</td>
+                        <td id="l-hex11">0x--------</td>
+                    </tr>
+                    <tr>
+                        <td id="l-addr12">0x--------</td>
+                        <td id="l-instr12">str r0, [r13, #8]</td>
+                        <td id="l-hex12">0x--------</td>
+                    </tr>
+                    <tr>
+                        <td id="l-addr13">0x--------</td>
+                        <td id="l-instr13">str r0, [r13, #8]</td>
+                        <td id="l-hex13">0x--------</td>
+                    </tr>
+                    <tr>
+                        <td id="l-addr14">0x--------</td>
+                        <td id="l-instr14">str r0, [r13, #8]</td>
+                        <td id="l-hex14">0x--------</td>
+                    </tr>
+                    <tr>
+                        <td id="l-addr15">0x--------</td>
+                        <td id="l-instr15">str r0, [r13, #8]</td>
+                        <td id="l-hex15">0x--------</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="theme-picker">
+            <div class="theme-option" id="umw-theme" data-theme-class="umw"></div>
+            <div class="theme-option" id="dark-theme" data-theme-class="dark"></div>
+        </div>
+        <div id="reset-button-container">
+            <a href="/reinitialize">
+                <img id="reset-button" src="{{ url_for('static', filename='images/restart.svg') }}" />
+            </a>
+        </div>
+        <header>
+            <h1>Chemu <span class="highlight">Web Interface</span></h1>
+        </header>
+        <main>
+            <section id="console-container">
+                <h2>I/O</h2>
+                <div id="table-wrapper">
+                    <table id="console-table">
+                        <tbody id="console-table-body">
+                            <tr><td>&nbsp;</td></tr>
+                            <tr><td>&nbsp;</td></tr>
+                            <tr><td>&nbsp;</td></tr>
+                            <tr><td>&nbsp;</td></tr>
+                            <tr><td>&nbsp;</td></tr>
+                            <tr><td>&nbsp;</td></tr>
+                            <tr><td>&nbsp;</td></tr>
+                            <tr><td>&nbsp;</td></tr>
+                            <tr><td>&nbsp;</td></tr>
+                            <tr><td>&nbsp;</td></tr>
+                            <tr><td>&nbsp;</td></tr>
+                            <tr><td>&nbsp;</td></tr>
+                            <tr><td>&nbsp;</td></tr>
+                            <tr><td>&nbsp;</td></tr>
+                            {% for s in output %}
+                                <tr><td>{{ s }}</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table></div>
+                <div id="input-container" class="input-container">
+                    <div class="input-decoration">&nbsp;%&nbsp;</div>
+                    <input type="text" id="user-input" placeholder="enter a command here"/>
+                </div>
+                <p class="or">or</p>
+		            <div>
+                <button type="button" id="step-button" onclick="stepPressed()">Step</button>
+                <button type="button" id="step-over-button" onclick="stepOverPressed()">Step Over</button>
+                </div>
+            </section>
+            <section id="instruction-container">
+                <h2>Instructions</h2>
+                <table id="instruction-table">
+                    <thead>
+                        <th id="instruction-address-col"></th>
+                        <th></th>
+                    </thead>
+                    <tbody>
+                        {% for instruction in instructions %}
+                        <tr {% if loop.index == 6 %} id="current-instruction-row" {% endif %}>
+                            <td id="instruction-address{{loop.index - 1}}">{{ instruction['address'] }}</td>
+                            <td id="instruction{{loop.index - 1}}">{{ instruction['instruction'] }}</td>
+                        </tr>
+                        {% if loop.index == 11 %}
+                        <tr>
+                            <td id="alternate-branch-label" colspan="2" style="text-align: center;">Alternate Branch</td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </section>
+            <section id="register-container">
+                <h2>Registers</h2>
+                <table id="registers-table">
+                    <thead>
+                        <th id="registers-col"></th>
+                        <th></th>
+                        <th id="registers-int-col"></th>
+                        <th id="registers-float-col"></th>
+                    </thead>
+                    {% for register in registers %}
+                    <tr>
+                        <td>{{ register['name'] }}:</td>
+                        <td id="reg{{loop.index-1}}-hex">{{ register['value'] }}</td>
+                        <td id="reg{{loop.index-1}}-int">{{ register['int'] }}</td>
+                        <td id="reg{{loop.index-1}}-float">{{ register['float'] }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td>flags:</td>
+                        <td id="flags-cell" colspan="3">{% for flag in flag_names %} {{ flag }}: <span id="flag-{{ flag }}">{{ flags[flag] }}</span> {% endfor %}</td>
+                    </tr>
+                </table>
+            </section>
+        </main>
+        <footer>
+            <p>
+                Web interface and Python backend implemented by <a href="mailto:lknight2@mail.umw.edu">Lauren Knight</a>
+            </p>
+            <p>
+                Thank you to <a href="mailto:ecooper@umw.edu">Professor Gusty Cooper</a>
+                and the <a href="https://www.umw.edu">University of Mary Washington</a> for the opportunity to work on this project :)
+            </p>
+        </footer>
+    </body>
+</html>

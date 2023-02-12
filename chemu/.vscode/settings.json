@@ -1,0 +1,22 @@
+{
+    "files.associations": {
+        "__locale": "c",
+        "__tuple": "c",
+        "array": "c",
+        "concepts": "c",
+        "functional": "c",
+        "iterator": "c",
+        "optional": "c",
+        "string": "c",
+        "string_view": "c",
+        "tuple": "c",
+        "type_traits": "c",
+        "variant": "c",
+        "version": "c",
+        "compare": "c",
+        "memory": "c",
+        "cpu.h": "c",
+        "memory.h": "c",
+        "stdarg.h": "c"
+    }
+}
