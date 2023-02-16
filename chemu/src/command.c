@@ -399,7 +399,7 @@ After printing the proc's name, slow motion does a sleep(sm_sleep)
                         pipeline();
                         update_display();
                         //printf("i again: %d\n", i);
-                        //sleep(sm_sleep); // TODO: sleep
+                        sleep(sm_sleep); // TODO: sleep
                     }
                     // OS services like strcpy are run in user mode
                     // The are located above 0x8000
@@ -420,7 +420,7 @@ After printing the proc's name, slow motion does a sleep(sm_sleep)
                         printres("%s", os_happenings[kval2]);
                         pipeline();
                         update_display();
-                        //sleep(5*sm_sleep); // TODO: sleep
+                        sleep(5*sm_sleep); // TODO: sleep
                         kval1 = kval2;
                     }
                     system_bus(0x0000, &uval3, READ);
@@ -437,7 +437,7 @@ After printing the proc's name, slow motion does a sleep(sm_sleep)
                         procname[7] = uval4 & 0xff;
                         procname[8] = 0; // uval3 and uval4 may have a null termination
                         printres("proc: %s", procname);
-                        //sleep(2*sm_sleep); // TODO: sleep
+                        sleep(2*sm_sleep); // TODO: sleep
                         uval1 = uval3;
                         uval2 = uval4;
                     }

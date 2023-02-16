@@ -182,10 +182,6 @@ void printreswin() {
     resi = 0;
 }
 
-void update_display() {
-
-}
-
 extern int doscanf;
 
 int cmdgetstr(char **ps, char *es, char **str);
@@ -383,6 +379,11 @@ static PyObject *grab_instructions() {
     insti = 0;
     return instruction_list;
 }
+
+void update_display() {
+    PyObject *instructions = grab_instructions();
+}
+
 
 static PyObject *grab_dump_updates() {
     char hex_value[11];
