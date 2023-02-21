@@ -160,8 +160,9 @@ def home():
         halted = False
         dump = []
         l_instructions = []
-        if not result['registers'] and command[0] == 's':
-            # emulator halted if no registers were updated
+        if not result['registers'] and ((command[0] == 's' and command[1] == ' ') or (command[0] == 's' and command[1] == 'm' and command[2] == ' ')):
+            # emulator halted if no registers were updated on a step command
+            # sm and st are commands with command[1] != ' '
             halted = True
             # try to detect branch-to-self (may be overzealous and catch false positives)
             if not result['output'][-1].startswith("Illegal instruction:"):

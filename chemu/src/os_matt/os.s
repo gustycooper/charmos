@@ -638,7 +638,14 @@ rfi 1
 // is it possible to do (proc name) -> (proc name)? )
 
 str r0, [sp, -4]!
-mov r0, #2
+ldr r0, sched_context        // address of scheduler's context
+cmp r1, r0                   // see if we are switching to scheduler
+bge to_schedule              // switch to scheduler
+mov r0, #2                   // switch to a proc
+bal swtch_skip
+.label to_schedule
+mov r0, #9	             // switch to scheduler
+.label swtch_skip
 str r0, context_switch_marker
 ldr r0, [sp], 4
 

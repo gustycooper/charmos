@@ -677,8 +677,8 @@ void dodefines() {
                 if (toks[i].toks[3].toktype == ident && toks[i].toks[4].toktype == rightbrack) {
                     ddv.key = strdup(toks[i].toks[1].tok_str);
                     ddv.type = DEFPARAMS;
-                    ddv.defvalue = strdup(toks[i].toks[2].tok_str);
-                    ddv.ivalue = toks[i].toks[2].tokv;
+                    ddv.defvalue = strdup(toks[i].toks[3].tok_str);
+                    ddv.ivalue = toks[i].toks[3].tokv;
                     ddv.head = 0;
                     struct deftok *prev = 0;
                  // printf("HELLO: numtoks: %d\n", toks[i].numtoks);
@@ -734,22 +734,36 @@ void dodefines() {
                         else if (ddv.type == DEFPARAMS) {
                         // Currently works for psh(X) str X, [sp, -4]!
                         // one paramter and psh(X) entirely replaced
+                        // TODO: Verify use of macro is syntactically correct
                         //  printf("GUSTY, ddv.head: %p\n", ddv.head);
                             // Replace instances of X with the argument
+                            // Correct for #define A[B] mov r0, B and #define psh[X] str X, [sp, -4]!
+                            // Notice that the params 10 and r0 are in position 2 of A[10] and psh[r0].
+                            // A pos 0, [ pos 1, and B pos 2
+                            // psh pos 0, [ pos 2, and X pos 2
+                            char *tok_str = toks[i].toks[j + 2].tok_str; // r0 is pos 2 of psh[r0]
+                            enum toks_t toktype = toks[i].toks[j + 2].toktype;
+                            int tokv = toks[i].toks[j + 2].tokv;
                             int k = 0;
                             for (struct deftok *dt = ddv.head; dt != 0; dt = dt->next) {
                                 if (dt->tok.tokv == 111) { // if the token is X
-                                    dt->tok.tok_str = toks[i].toks[j + 2].tok_str; // psh[r0 <- r0 is in pos j+2
-                                    dt->tok.toktype = toks[i].toks[j + 2].toktype;
-                                    dt->tok.tokv = toks[i].toks[j + 2].tokv;
+                                    //printf("XXX: tok_str: %s\n", dt->tok.tok_str);
+                                    //printf("YY0: tok_str: %s\n", toks[i].toks[j + 0].tok_str);
+                                    //printf("YY1: tok_str: %s\n", toks[i].toks[j + 1].tok_str);
+                                    //printf("YY2: tok_str: %s\n", toks[i].toks[j + 2].tok_str);
+                                    //printf("YY3: tok_str: %s\n", toks[i].toks[j + 3].tok_str);
+                                    dt->tok.tok_str = tok_str; // psh[r0 <- r0 is in pos j+2
+                                    dt->tok.toktype = toktype;
+                                    dt->tok.tokv = tokv;
                                 }
                                 toks[i].toks[k] = dt->tok; // update toks[k] with the substituted token
-                        //      printf("t.toks[%d].tok_str: %7s | ", k, dt->tok.tok_str);
-                        //      printf("t.toks[%d].toktype: %10s | ", k, toks_t_str[dt->tok.toktype]);
-                        //      printf("t.toks[%d].tokv   : %7d | ", k, dt->tok.tokv);
-                        //      printf("\n");
+                                //printf("X.toks[%d].tok_str: %7s | ", k, dt->tok.tok_str);
+                                //printf("X.toks[%d].toktype: %10s | ", k, toks_t_str[dt->tok.toktype]);
+                                //printf("X.toks[%d].tokv   : %7d | ", k, dt->tok.tokv);
+                                //printf("\n");
                                 k++;
                             }
+                            printf("\n");
                             toks[i].numtoks = k;
                             tok = toks[i]; // toksvalue changes the global variable tok
                         //  printtok(tok);

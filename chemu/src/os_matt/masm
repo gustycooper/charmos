@@ -1,5 +1,5 @@
-../../chpre/chpre -c < $1 > g.s
-../../chasm/chasm g.s
+../../../chpre/chpre -c < $1 > g.s
+../../../chasm/chasm g.s
 #following shows how to extract file name from $1
 filename=$(basename -- "$1")
 extension="${filename##*.}"

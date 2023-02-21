@@ -15,14 +15,15 @@
 
 char *os_happenings[] = {
     "Default",
-    "Trap Frame", // Matt: (#1) Context switch marker for building
-    "Switch", // Matt: (#2) Context switch marker for performing
-    "yield to sched", // Matt: (#3) Proc yields to OS scheduler
-    "sched", // Matt: (#4) Contex switch marker for entering sched
-    "scheduler", // Matt: (#5) Context switch marker for entering scheduler
-    "schedules proc", // Matt: (#6) Context switch marker for choosing new proc;
-    "restore proc regs", // Matt: (#7) Context marker for popping the trap frame from
-    "read to run proc" // Matt: (#8) Ready to run new current proc.
+    "Timer Interrupt Handler", // Matt: (#1) Context switch marker for building
+    "Function Switch: to Proc", // Matt: (#2) Context switch marker for performing
+    "Current Proc Yields to sched", // Matt: (#3) Proc yields to OS scheduler
+    "In function sched", // Matt: (#4) Contex switch marker for entering sched
+    "Entering Scheduler", // Matt: (#5) Context switch marker for entering scheduler
+    "Scheduler Selects Next Proc", // Matt: (#6) Context switch marker for choosing new proc;
+    "Restore Proc Regs - Rdy to return to Proc", // Matt: (#7) Context marker for popping the trap frame from
+    "Return to Selected Proc", // Matt: (#8) Ready to run new current proc.
+    "Function Switch: to Scheduler" // Matt: (#9)
 };
 
 /*
