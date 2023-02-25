@@ -16,14 +16,14 @@
 char *os_happenings[] = {
     "Default",
     "Timer Interrupt Handler", // Matt: (#1) Context switch marker for building
-    "Function Switch: to Proc", // Matt: (#2) Context switch marker for performing
+    "Context Switch: to Proc", // Matt: (#2) Context switch marker for performing
     "Current Proc Yields to sched", // Matt: (#3) Proc yields to OS scheduler
     "In function sched", // Matt: (#4) Contex switch marker for entering sched
     "Entering Scheduler", // Matt: (#5) Context switch marker for entering scheduler
     "Scheduler Selects Next Proc", // Matt: (#6) Context switch marker for choosing new proc;
     "Restore Proc Regs - Rdy to return to Proc", // Matt: (#7) Context marker for popping the trap frame from
     "Return to Selected Proc", // Matt: (#8) Ready to run new current proc.
-    "Function Switch: to Scheduler" // Matt: (#9)
+    "Context Switch: to Scheduler" // Matt: (#9)
 };
 
 /*
@@ -416,12 +416,14 @@ After printing the proc's name, slow motion does a sleep(sm_sleep)
                     }
                     system_bus(0xfff0, &kval2, READ);
                     if (kval1 != kval2) {
-                        if (kval2 > 8) // TODO: 3 is num of events is os_happenings
+                        if (kval2 > 9) // TODO: 9 is num of events is os_happenings
                             kval2 = 0; // default
+                        if (kval2 == 1)
+                            printres(" "); // blank line in front of Timer Interrupt
                         printres("%s", os_happenings[kval2]);
                         pipeline();
                         update_display();
-                        sleep(5*sm_sleep); // TODO: sleep
+                        sleep(3*sm_sleep); // TODO: sleep
                         kval1 = kval2;
                     }
                     system_bus(0x0000, &uval3, READ);
@@ -437,7 +439,7 @@ After printing the proc's name, slow motion does a sleep(sm_sleep)
                         procname[6] = (uval4 >> 8)  & 0xff;
                         procname[7] = uval4 & 0xff;
                         procname[8] = 0; // uval3 and uval4 may have a null termination
-                        printres("proc: %s", procname);
+                        printres("Proc Selected: %s", procname);
                         sleep(2*sm_sleep); // TODO: sleep
                         uval1 = uval3;
                         uval2 = uval4;
