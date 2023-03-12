@@ -73,7 +73,7 @@ char *toks_t_str[] = { "data", "text", "label", "string", "inst", "comment",
                         "reg", "comma", "number", "leftbrack", "rightbrack", "exclam", "ident", "err", "endd", "define" };
 
 #define MAX_LINE 128        // maximum length of asm prog line
-#define MAX_TOKENS 15       // maximum number of tokens on asm program line
+//#define MAX_TOKENS 25       // maximum number of tokens on asm program line DEFINED in chasm_types.h
 #define MAX_PROG_LINES 2000 // maximum number of lines in an asm program
 
 static char buf[MAX_LINE];              // lines from .chasm file read into buf
@@ -642,6 +642,7 @@ void dodefines() {
         // tok[1].str -> <id>,    tok[1].type -> ident,  tok[1].tokv -> 0
         // tok[2].str -> <num>,   tok[2].type -> number, tok[2].tokv -> value of <num>
         // tok[3].str -> NULL,    tok[3].type -> endd,   tok[3].tokv -> 0
+            int numparams = 0;
             struct defdictval ddv;
             if (toks[i].numtoks == 4 && toks[i].toks[1].toktype == ident && toks[i].toks[2].toktype == number) {
                 ddv.key = strdup(toks[i].toks[1].tok_str);
@@ -669,47 +670,38 @@ void dodefines() {
                 //dictput(strdup(toks[i].toks[1].tok_str), 0, 0);
                 havedefine = 1;
             }
-            else if (toks[i].toks[1].toktype == ident && toks[i].toks[2].toktype == leftbrack) {
+            else if ((numparams = validmacro(toks[i]))) {
                 // use [] for now. #define psh[X] str X, [sp, -4]!
                 // eventually add ( and ) as tokens
-                // Must write a FSM to check for multiple args.
-                // For now, just process one arg
-                if (toks[i].toks[3].toktype == ident && toks[i].toks[4].toktype == rightbrack) {
-                    ddv.key = strdup(toks[i].toks[1].tok_str);
-                    ddv.type = DEFPARAMS;
-                    ddv.defvalue = strdup(toks[i].toks[3].tok_str);
-                    ddv.ivalue = toks[i].toks[3].tokv;
-                    ddv.head = 0;
-                    struct deftok *prev = 0;
-                 // printf("HELLO: numtoks: %d\n", toks[i].numtoks);
-                    // create linked list of struct deftok 
-                    // #define psh[X] str X, [sp, -4]! creates the following linked list
-                    // dt.head > str > X > , > [ > , > -4 > ] > ! > endd
-                    for (int j = 5; j < toks[i].numtoks; j++) {
-                 //     printf("tok[%d], prev: %p\n", j, prev);
-                        struct deftok *dt = malloc(sizeof(struct deftok));
-                        dt->tok = toks[i].toks[j];
-                        if (dt->tok.toktype == ident && (strcmp(dt->tok.tok_str, toks[i].toks[3].tok_str) == 0))
-                            dt->tok.tokv = 111;
-                        dt->next = 0;
-                        if (prev == 0) {
-                            ddv.head = dt;
-                 //         printf("ddv.head has a value\n");
-                        }
-                        else
-                            prev->next = dt;
-                        prev = dt;
-                            
+                ddv.key = strdup(toks[i].toks[1].tok_str);
+                ddv.type = DEFPARAMS;
+                ddv.defvalue = strdup(toks[i].toks[3].tok_str);
+                ddv.ivalue = toks[i].toks[3].tokv;
+                ddv.head = 0;
+                struct deftok *prev = 0;
+                // create linked list of struct deftok 
+                // #define psh[X] str X, [sp, -4]! creates the following linked list
+                // dt.head -> str -> X -> , -> [ -> , -> -4 -> ] -> ! -> endd
+                toks[i].toks[1].tokv = numparams;
+                for (int j = 1; j < toks[i].numtoks; j++) {
+                    struct deftok *dt = malloc(sizeof(struct deftok));
+                    dt->tok = toks[i].toks[j];
+                    dt->next = 0;
+                    if (prev == 0) {
+                        ddv.head = dt;
+                        dt->tok.tokv = numparams;
                     }
-                    defdictputval(&ddv);
-                    havedefine = 1;
+                    else
+                        prev->next = dt;
+                    prev = dt;
+                        
                 }
-                else { // error
-                    toks[i].linetype = err;
-                }
+                defdictputval(&ddv);
+                havedefine = 1;
             }
             else { // error
                 toks[i].linetype = err;
+                havedefine = 0; // error so stop macro expansion
             }
         }
         // The variable havedefine is an optimization.
@@ -731,48 +723,62 @@ void dodefines() {
                             toksvalue(toks[i].toks[j].tok_str, j); // update value of the substituted ID
                             toks[i] = tok;
                         }
-                        else if (ddv.type == DEFPARAMS) {
-                        // Currently works for psh(X) str X, [sp, -4]!
-                        // one paramter and psh(X) entirely replaced
-                        // TODO: Verify use of macro is syntactically correct
-                        //  printf("GUSTY, ddv.head: %p\n", ddv.head);
-                            // Replace instances of X with the argument
-                            // Correct for #define A[B] mov r0, B and #define psh[X] str X, [sp, -4]!
-                            // Notice that the params 10 and r0 are in position 2 of A[10] and psh[r0].
-                            // A pos 0, [ pos 1, and B pos 2
-                            // psh pos 0, [ pos 2, and X pos 2
-                            char *tok_str = toks[i].toks[j + 2].tok_str; // r0 is pos 2 of psh[r0]
-                            enum toks_t toktype = toks[i].toks[j + 2].toktype;
-                            int tokv = toks[i].toks[j + 2].tokv;
-                            int k = 0;
-                            for (struct deftok *dt = ddv.head; dt != 0; dt = dt->next) {
-                                if (dt->tok.tokv == 111) { // if the token is X
-                                    //printf("XXX: tok_str: %s\n", dt->tok.tok_str);
-                                    //printf("YY0: tok_str: %s\n", toks[i].toks[j + 0].tok_str);
-                                    //printf("YY1: tok_str: %s\n", toks[i].toks[j + 1].tok_str);
-                                    //printf("YY2: tok_str: %s\n", toks[i].toks[j + 2].tok_str);
-                                    //printf("YY3: tok_str: %s\n", toks[i].toks[j + 3].tok_str);
-                                    dt->tok.tok_str = tok_str; // psh[r0 <- r0 is in pos j+2
-                                    dt->tok.toktype = toktype;
-                                    dt->tok.tokv = tokv;
+                        else if (ddv.type == DEFPARAMS  && validexpand(toks[i]) == ddv.head->tok.tokv) {
+                            // validexpand call only works when macro invoked as an entire line
+                            struct tokv_t macro[25], expand[25];
+                            // macro psh[X,Y] has 2 params and 6 toks
+                            int numparams = ddv.head->tok.tokv; // params on macro
+                            int numtoks = 3 + numparams + (numparams - 1); // toks on macro
+                            int im = 0, em = 0;
+                            // build macro and expand from ddv toks
+                            // psh [ X , Y ] str X , [ Y , -4 ] !
+                            // macro gets : psh [ X , Y ]
+                            // expand gets : str X , [ Y , -4 ] !
+                            for (struct deftok *dt = ddv.head; dt != 0; dt = dt->next)
+                                if (im < numtoks)
+                                    macro[im++] = dt->tok;
+                                else
+                                    expand[em++] = dt->tok;
+                            if (verbose) {
+                                for (int j = 0; j < im; j++) {
+                                    printf("macro[%d].tok_str: %7s | ", j, macro[j].tok_str);
+                                    printf("macro[%d].toktype: %10s | ", j, toks_t_str[macro[j].toktype]);
+                                    printf("macro[%d].tokv   : %7d | ", j, macro[j].tokv);
+                                    printf("\n");
                                 }
-                                toks[i].toks[k] = dt->tok; // update toks[k] with the substituted token
-                                //printf("X.toks[%d].tok_str: %7s | ", k, dt->tok.tok_str);
-                                //printf("X.toks[%d].toktype: %10s | ", k, toks_t_str[dt->tok.toktype]);
-                                //printf("X.toks[%d].tokv   : %7d | ", k, dt->tok.tokv);
-                                //printf("\n");
-                                k++;
+                                for (int j = 0; j < em; j++) {
+                                    printf("expand[%d].tok_str: %7s | ", j, expand[j].tok_str);
+                                    printf("expand[%d].toktype: %10s | ", j, toks_t_str[expand[j].toktype]);
+                                    printf("expand[%d].tokv   : %7d | ", j, expand[j].tokv);
+                                    printf("\n");
+                                }
                             }
-                            printf("\n");
-                            toks[i].numtoks = k;
-                            tok = toks[i]; // toksvalue changes the global variable tok
-                        //  printtok(tok);
-                        //  printf("tok_str: %s\n", toks[i].toks[0].tok_str);
-                            toksvalue(toks[i].toks[0].tok_str, 0); // update value of first token
-                            tok.linetype = tok.toks[0].toktype;    // update linetype to match toktype
-                            toks[i] = tok;
-                        //  printtok(tok);
-                        //  printf("Cooper\n");
+                            // substitute arg for param
+                            // arg is in toks[i].toks
+                            // param is defined in macro and used in expand
+                            for (int j = 0; j < numparams; j++) {
+                                struct tokv_t argtok = toks[i].toks[2 + j * 2];
+                                struct tokv_t paramtok = macro[2 + j * 2];
+                                if (verbose) {
+                                    printf("argtok.tok_str: %7s | ", argtok.tok_str);
+                                    printf("argtok.toktype: %10s | ", toks_t_str[argtok.toktype]);
+                                    printf("argtok.tokv   : %7d | ", argtok.tokv);
+                                    printf("\n");
+                                    printf("paramtok.tok_str: %7s | ", paramtok.tok_str);
+                                    printf("paramtok.toktype: %10s | ", toks_t_str[paramtok.toktype]);
+                                    printf("paramtok.tokv   : %7d | ", paramtok.tokv);
+                                    printf("\n");
+                                }
+                                for (int k = 0; k < em; k++)
+                                    if (expand[k].toktype == ident &&
+                                        strcmp(expand[k].tok_str, paramtok.tok_str) == 0)
+                                        expand[k] = argtok;
+                            }
+                            for (int j = 0; j < em; j++) {
+                                toks[i].toks[j] = expand[j];
+                            }
+                            toks[i].linetype = toks[i].toks[0].toktype;
+                            toks[i].numtoks = em;
                         }
                     }
                 }
@@ -968,8 +974,9 @@ int main(int argc, char **argv) {
     if (verbose) {
         printf("*******************************\n");
         dictprint(verbose);
-        for (int i = 0; i < linenum-1; i++)
+        for (int i = 0; i < linenum-1; i++) {
             printtok(toks[i]);
+        }
     }
 
     /*

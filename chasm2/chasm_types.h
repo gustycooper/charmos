@@ -1,6 +1,6 @@
 #ifndef CHASM_TYPES_H
 #define CHASM_TYPES_H
-#define MAX_TOKENS 15
+#define MAX_TOKENS 25
 
 enum inst_c {
     ldrstr, arilog, movcmp, branch, 

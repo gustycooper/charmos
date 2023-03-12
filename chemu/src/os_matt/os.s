@@ -31,7 +31,7 @@
 #define CONTEXT_PC 60
 #define RUNNING 3
 #define READY 2
-#define SLEEP 4
+#define ASLEEP 4
 #define LOAD_MALLOC 1
 
 // -----------------------------------------------------------------------
@@ -949,8 +949,8 @@ mov pc, lr
 .label sleep
 str lr,  [sp, -4]!
 ldr r2, curr_proc
-mov r1, SLEEP                 // put SLEEP state in r1
-str r1, [r2, PROC_STATE]      // store SLEEP in curr_proc->state
+mov r1, ASLEEP                // put ASLEEP state in r1
+str r1, [r2, PROC_STATE]      // store ASLEEP in curr_proc->state
 str r0, [r2, PROC_CHAN]       // store channel in curr_proc->channel
 blr sched
 ldr lr,  [sp], 4
@@ -966,7 +966,7 @@ mva r2, ptable_end            // r2 is end of ptable
 cmp r1, r2                    // check if at end of ptable
 bge sleep_done
 ldr r3, [r1, PROC_STATE]      // check if proc's state is sleeping
-cmp r3, SLEEP
+cmp r3, ASLEEP
 bne sleep_skip                // no, check next proc
 ldr r3, [r1, PROC_CHAN]       // check if sleeping in channel in r0
 cmp r3, r0

@@ -252,3 +252,72 @@ int isinst(struct toki_t t) {
         s = trans[s][t.toks[i++].toktype];
     return s < 0 ? -1 : opcode | trans[s][endd];
 }
+
+/*
+ #define macros have the format
+ <id> [ <id> , <id> ... ] <more tokens>
+ The <id>s inside the brackets can be from 1 to N
+ The state table and function validate upto the ]
+ The remainder of the macro definition is ignored.
+ */
+
+int macros[10][15] = 
+      //  dat txt lab str ins cmt reg cma num   [   ]   ! idt bad end
+/* 0*/  { {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  1, -1, -1},
+/* 1*/    {-1, -1, -1, -1, -1, -1, -1, -1, -1,  2, -1, -1, -1, -1, -1},
+/* 2*/    {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  3, -1, -1},   // looking for id
+/* 3*/    {-1, -1, -1, -1, -1, -1, -1,  2, -1, -1, -4, -1, -1, -1, -1},   // id between [ and ] found
+/* 4*/    {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+        };
+
+#define PARAM_FOUND 3
+
+// Return of 0 is invalide
+// Return >0 is number of params between [ and ]
+// #define psh[r0] -> this begins at toks[1]
+int validmacro(struct toki_t t) {
+    int i = 1;  // t.toks[0] is #define
+    int numparams = 0;
+    int s = macros[0][t.toks[i++].toktype];
+    while (s >= 0 && t.toks[i].toktype != endd && t.toks[i].toktype != comment) {
+        if (s == PARAM_FOUND)
+            numparams++;
+        s = macros[s][t.toks[i++].toktype];
+    }
+    return s == -4 ? numparams : 0;
+}
+
+/*
+ using macros (i.e. expand them) have the format
+ <id> [ <arg> , <arg> ... ]
+ The <arg>s inside the brackets can be from 1 to N
+ The <arg>s can be <id>, <num>, <reg>, <str>, and <ins>
+ The state table and function validate upto the ]
+ Anything after the ] is ignored.
+ */
+
+int expands[10][15] = 
+      //  dat txt lab str ins cmt reg cma num   [   ]   ! idt bad end
+/* 0*/  { {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  1, -1, -1},
+/* 1*/    {-1, -1, -1, -1, -1, -1, -1, -1, -1,  2, -1, -1, -1, -1, -1},
+/* 2*/    {-1, -1, -1,  3,  3, -1,  3, -1,  3, -1, -1, -1,  3, -1, -1},   // looking for id, num, reg, str, ins
+/* 3*/    {-1, -1, -1, -1, -1, -1, -1,  2, -1, -1, -4, -1, -1, -1, -1},   // arg between [ and ] found
+/* 4*/    {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+        };
+
+#define ARG_FOUND 3
+
+// Return of 0 is invalide
+// Return >0 is number of args between [ and ]
+// psh[r0] -> this begins at toks[0]
+int validexpand(struct toki_t t) {
+    int i = 0;  // t.toks[0] is macro name
+    int numargs = 0;
+    int s = expands[0][t.toks[i++].toktype];
+    while (s >= 0 && t.toks[i].toktype != endd && t.toks[i].toktype != comment) {
+        if (s == ARG_FOUND)
+            numargs++;
+        s = expands[s][t.toks[i++].toktype];
+    }
+    return s == -4 ? numargs : 0;
+}
