@@ -84,6 +84,20 @@ struct toki_t tok;                      // used to tokenize a line
 struct toki_t toks[MAX_PROG_LINES];     // all tokenized lines are stored in toks
 
 /*
+ islabel - various .label directives are equivalent.
+ For example, .label, .variable, and .array are equivalent.
+ islabel returns true if the token is any of the equivalent values
+ and returns fales otherwise.
+ */
+char *label_vals[] = { ".label", ".local", ".extern", ".variable", ".array", ".structure", ".pointer",  ".function" };
+int islabel(char *l) {
+    for (int i = 0; i < sizeof(label_vals) / sizeof(char*); i++)
+        if (strcmp(l, label_vals[i]) == 0)
+            return 1;
+    return 0;
+}
+
+/*
  toksvalue - determine token type and value of the string t and put value in tok.toks[n].toktype, .tokv
  struct toki_t tok is built for each line in assembly file
  tok.toks[] is array of tokens on the current line
@@ -123,7 +137,7 @@ void toksvalue(char *t, int n) {
         tok.toks[n].toktype = data;
     else if (strcmp(t, ".text") == 0)
         tok.toks[n].toktype = text;
-    else if (strcmp(t, ".label") == 0 || strcmp(t, ".local") == 0 || strcmp(t, ".extern") == 0)
+    else if (islabel(t))
         tok.toks[n].toktype = label;
     else if (strcmp(t, ".string") == 0)
         tok.toks[n].toktype = string;
@@ -294,13 +308,8 @@ void addrsymopcode() {
         if ((toks[i].linetype == data || toks[i].linetype == text) && toks[i].numtoks == 3)
             address = toks[i].toks[1].tokv; // update address based on .data and .text directives
         else if (toks[i].linetype == label) {
-            if (toks[i].toks[0].tok_str[2] == 'a') { // .label directive
-                toks[i].address = address;
-                toks[i].section = section;
-                if (dictput(toks[i].toks[1].tok_str, toks[i].address, toks[i].section)) // add to symbol table
-                    toks[i].linetype = err;     // duplicate symbol
-            }
-            else {
+            if ((toks[i].toks[0].tok_str[1] == 'l' && toks[i].toks[0].tok_str[2] == 'o') || 
+                 toks[i].toks[0].tok_str[2] == 'x') { // .local or .extern directive
                 toks[i].address = address;
                 toks[i].section = section;
                 struct dictval dv;
@@ -317,6 +326,12 @@ void addrsymopcode() {
                     dv.svalue = "XXXXX";
                 }
                 if (dictputval(&dv))
+                    toks[i].linetype = err;     // duplicate symbol
+            }
+            else { // .label, .variable, .array, .structure, .pointer, .function directives
+                toks[i].address = address;
+                toks[i].section = section;
+                if (dictput(toks[i].toks[1].tok_str, toks[i].address, toks[i].section)) // add to symbol table
                     toks[i].linetype = err;     // duplicate symbol
             }
         }
