@@ -794,6 +794,19 @@ void dodefines() {
                             }
                             toks[i].linetype = toks[i].toks[0].toktype;
                             toks[i].numtoks = em;
+                            // We must assign four attributes of line.
+                            // This works for lines that are instructions. Good for now. TODO: Check this out
+                            // We know that toktype is inst, but we must determine insttype, instcate, and instopcd
+                            // insttype, instcate, and instopcd are in the struc inst_info inst[]
+                            if (toks[i].linetype == inst) {
+                                for (int j = 0; j < sizeof(ins) / sizeof(struct inst_info); j++) // check for insts
+                                    if (strcmp(toks[i].toks[0].tok_str, ins[j].inst_str) == 0) {
+                                    //if (*(int*)t == ins[i].inst_int) { // inst_int is integer of 3 char instruction
+                                        toks[i].insttype = ins[j].inst_t;
+                                        toks[i].instcate = ins[j].inst_c;
+                                        toks[i].instopcd = ins[j].opcode;
+                                    }
+                            }
                         }
                     }
                 }
