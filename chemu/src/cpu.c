@@ -30,6 +30,12 @@ int loop_stop = LOOP_STOP;
 int verbose_cpu = 0;
 
 /******************************************************************
+ ***************************  EXECUTE  ****************************
+ ** global os_lite - main() sets this via -o option              **
+ ******************************************************************/
+int os_lite = 0;
+
+/******************************************************************
  ************************  INST HISTORY  **************************
  ** save the last INSTHIST instructions executed                 **
  ******************************************************************/
@@ -716,9 +722,13 @@ enum stepret step() {
                if (bit_test(cpsr, U) && bit_test(cpsr, OS)) { // user mode and OS loaded
                    registers[0] = d->immediate20;  // ker #imm value to r0
                    registers[LR] = pc + 4;         // return address to LR
-                   //bit_clear(&cpsr, U);            // clear user mode bit
-                   //system_bus(rupt, &pc, READ);    // get base addr of OS from interrupt table
-                   pc = interrupt(KERNEL);
+                   if (os_lite) {
+                       bit_clear(&cpsr, U);            // clear user mode bit
+                       system_bus(rupt, &pc, READ);    // get base addr of OS from interrupt table
+                   }
+                   else {
+                       pc = interrupt(KERNEL);
+                   }
                }
                else {
                    printf("Illegal use of ker Instruction\n");

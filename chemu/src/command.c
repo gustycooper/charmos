@@ -37,6 +37,7 @@ void update_display();
 extern int verbose_cpu;
 extern int total_steps;
 extern int loop_stop;
+extern int os_lite;
 /*
  Defines used to access members of OS struct proc.
  */
@@ -416,6 +417,7 @@ After printing the proc's name, slow motion does a sleep(sm_sleep)
                     }
                     system_bus(0xfff0, &kval2, READ);
                     if (kval1 != kval2) {
+                        //printres("kvals: %x, %x", kval1, kval2);
                         if (kval2 > 9) // TODO: 9 is num of events is os_happenings
                             kval2 = 0; // default
                         if (kval2 == 1)
@@ -794,7 +796,7 @@ int process_args(int argc, char **argv) {
             break;
           case 'o': 
             load_os = 1;
-            osfilename = "os.o";
+            osfilename = "os_lite.o";
             break;
           case 'f': 
             load_os = 1;
@@ -828,9 +830,10 @@ int process_args(int argc, char **argv) {
         fclose(osf);
         load_memory(osfilename);
         set_cpsr(OS);
-        //set_cpsr(U);
+        set_cpsr(U);
         //set_rupt(0x7ff0);
         set_rupt(0xff00);
+        os_lite = 1;
     }
     FILE *file = fopen(argv[0], "rb");
     if (file == NULL) {
