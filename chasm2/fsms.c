@@ -3,8 +3,9 @@
 #include <stdio.h>
 
 /*
- * FSMs to recognize numbers, identifiers, registers, and instructions. 
+ * FSMs to recognize numbers, floats, identifiers, registers, and instructions. 
  * Number formats: 123 -123 #123 #-123 0x123, #0x123
+ * Float formats: 3.145, -3.2, 4.5E10, 1.23E-3
  * Identifier formats: abc ab12 ab_12
  * For numbers there are 8 numstates and 21 numletters. The variable numtrans[][] provides the state transition table
  * For idents there are 4 idstates and 4 idletters. The variable idtrans[][] provides the state transition table
@@ -52,6 +53,47 @@ int isnumber(char *n) {
     while (s != bad && s != gud && s != gux)
         s = numtrans[s][chartolet(*n++)];
     return s == gud ? 10 : s == gux ? 16 : 0;
+}
+    
+enum floatstates  { fstart, fnum, fneg, frac, exp, exp1, exp2, fgud, fbad };
+
+               //       0          1      2      3     4         5       6        7
+enum floatletters { zerotonine,  fminus, point, lete, fbackzero, fother };
+
+enum floatstates floattrans[10][8] = 
+               //  0-9  -    .    e    \0  oth
+ /* fstart */  { {fnum,fneg,frac,fbad,fbad,fbad},
+ /* fnum   */    {fnum,fbad,frac,exp, fbad,fbad},
+ /* fneg   */    {fneg,fbad,frac,fgud,fbad,fbad},
+ /* frac   */    {frac,fbad,fbad,exp, fgud,fbad},
+ /* exp    */    {exp1,exp2,fbad,fbad,fbad,fbad},
+ /* exp1   */    {exp1,fbad,fbad,fbad,fgud,fbad},
+ /* exp2   */    {exp1,fbad,fbad,fbad,fbad,fbad},
+              };
+// Maps a char to one of the numletters
+enum floatletters chartofloatlet(char c) {
+    if (c >= '0' && c <= '9')
+        return zerotonine;
+    else if (c == '-')
+        return fminus;
+    else if (c == '.')
+        return point;
+    else if (c == 'e')
+        return lete;
+    else if (c == '\0')
+        return fbackzero;
+    else
+        return fother;
+}
+
+// Input: string that may be a floating point literal
+// Ouput: 0 - not a floating point literal, 1 - is a floating point literal
+int isfloat(char *n) {
+    enum floatstates s = floattrans[fstart][chartofloatlet(*n++)];
+    while (s != fbad && s != fgud) {
+        s = floattrans[s][chartofloatlet(*n++)];
+    }
+    return s == fgud ? 1 : 0;
 }
     
 enum idstates { idstart, id, idgud, idbad };

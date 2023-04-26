@@ -89,7 +89,7 @@ struct toki_t toks[MAX_PROG_LINES];     // all tokenized lines are stored in tok
  islabel returns true if the token is any of the equivalent values
  and returns fales otherwise.
  */
-char *label_vals[] = { ".label", ".local", ".extern", ".variable", ".array", ".structure", ".pointer",  ".function" };
+char *label_vals[] = { ".label", ".local", ".extern", ".variable", ".array", ".structure", ".pointer",  ".float", ".function" };
 int islabel(char *l) {
     for (int i = 0; i < sizeof(label_vals) / sizeof(char*); i++)
         if (strcmp(l, label_vals[i]) == 0)
@@ -166,6 +166,11 @@ void toksvalue(char *t, int n) {
     else if (t[0] == 's' && t[1] == 'p') {
         tok.toks[n].toktype = reg;
         tok.toks[n].tokv = 13;
+    }
+    else if (isfloat(t)) {
+        tok.toks[n].toktype = number;
+        float f = strtof(t, NULL);
+        memcpy(&tok.toks[n].tokv, &f, 4);
     }
     else if ((base = isnumber(t))) {
         tok.toks[n].toktype = number;
