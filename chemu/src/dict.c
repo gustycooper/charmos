@@ -82,3 +82,65 @@ void dictshow() {
     }
 }
 
+
+struct elema {
+    struct elema *next;
+    int key;
+    char *value;
+};
+#define DICT_SIZEA 31
+struct elema *dicta[DICT_SIZEA] = { 0 };
+int num_elemsa = 0;
+
+/*
+ dictput - puts key, value pair in symbol table
+ input
+  char *key - string that is key
+  int value - value of key, value pair
+ output
+  0 - success
+  1 - duplicate symbol
+ */
+int dictputa(int key, char *value) {
+    struct elema *e;
+    int h = key % DICT_SIZE;
+    e = dicta[h];
+    while (e != NULL) {
+        if (e->key == key) {
+            //printf("duplicate symbol: %s", key);
+            return 1;
+        }
+        e = e->next;
+    }
+    e = malloc(sizeof(*e));
+    e->key = key;
+    e->value = strdup(value);
+    e->next = dicta[h];
+    dicta[h] = e;
+    num_elemsa++;
+    /* grow table if there is not enough room
+    if(num_elems >= DICT_SIZE * MAX_LOAD_FACTOR) {
+        grow(d);
+    }
+    */
+    return 0;
+}
+
+char *dictgeta(int key) {
+    for (struct elema *e = dicta[key % DICT_SIZE]; e != 0; e = e->next) {
+        if (e->key == key) {
+            return e->value;
+        }
+    }
+    return 0;
+}
+
+void dictshowa() {
+    printres("**** dicta symbols ****");
+    for (int i = 0; i < DICT_SIZE; i++) {
+        for (struct elema *e = dicta[i]; e != 0; e = e->next) {
+            printres("symbol: 0x%x, value: %s", e->key, e->value);
+        }
+    }
+}
+

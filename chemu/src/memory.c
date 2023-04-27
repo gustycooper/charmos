@@ -150,6 +150,7 @@ void load_memory(char *filename) {
             int value, symsection; // symsection used by chlinker
             sscanf(buf, "%s %x %d", symbol, &value, &symsection);
             dictput(symbol, value);
+            dictputa(value, symbol);
             // printf("%s %d\n", symbol, value);
         }
         else { // number

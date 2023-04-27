@@ -5,6 +5,7 @@
 #include "cpu.h"
 #include "isa.h"
 #include "charmopcodes.h"
+#include "dict.h"
 
 /*
  * Charm instructions have an 8-bit opcode field, which yields 256 instructions
@@ -168,6 +169,7 @@ char *disassemble(unsigned int inst) {
     }
 
     char buf[25];
+    char *id;
     switch (d->opcode >> 4 & 0xf) {
       case LDR: case LDB: case STR: case STB: // ldr, ldb, str, stb
         p = strcat(p, ldrstr_strs[(d->opcode >> 4 & 0xf)-1]);
@@ -175,7 +177,10 @@ char *disassemble(unsigned int inst) {
         p = strcat(p, buf);
         switch (d->opcode & 0xf) {
           case ADDR:
-            sprintf(buf, "0x%x", d->address);
+            if ((id = dictgeta(d->address)))
+                sprintf(buf, "%s", id);
+            else
+                sprintf(buf, "0x%x", d->address);
             break;
           case BASE:
             sprintf(buf, "[r%d]", d->rm);
@@ -216,14 +221,22 @@ char *disassemble(unsigned int inst) {
         p = strcat(p, movcmp_strs[d->opcode & 0xf]);
         if ((d->opcode >> 4 & 0xf) == 7) // rd, rm
             sprintf(buf, "r%d, r%d", d->rd, d->rm);
-        else // rd, #imm
-            sprintf(buf, "r%d, #%d", d->rd, d->immediate16);
+        else  {// rd, #imm or rd, addr
+            if ((d->opcode & 0xf) == MVA && (id = dictgeta(d->address)))
+                sprintf(buf, "r%d, %s", d->rd, id);
+            else
+                sprintf(buf, "r%d, #%d", d->rd, d->immediate16);
+        }
         p = strcat(p, buf);
         break;
       case B_ADDR: case B_REG: case B_REL: // branch inst
         p = strcat(p, branch_strs[d->opcode & 0xf]);
-        if ((d->opcode >> 4 & 0xf) == 9) // bal address
-            sprintf(buf, "#%08x", d->address);
+        if ((d->opcode >> 4 & 0xf) == 9) { // bal address
+            if ((id = dictgeta(d->address)))
+                sprintf(buf, "%s", id);
+            else
+                sprintf(buf, "#%08x", d->address);
+        }
         else if ((d->opcode >> 4 & 0xf) == 10) // bal [rd]
             sprintf(buf, "[r%d]", d->rd);
         else // bal offset

@@ -703,6 +703,7 @@ After printing the proc's name, slow motion does a sleep(sm_sleep)
         printres("hex: 0x%x", val);
     } else if (cmdargv[0][0] == 'y') { // show symbols
         dictshow();
+        dictshowa();
     } else if (cmdargv[0][0] == '.') {
         for (int i = 0; i < strlen(cmdargv[0]); i++) // cp the null char also
             cmdargv[0][i] = cmdargv[0][i+1];
