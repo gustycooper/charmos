@@ -770,6 +770,7 @@ static struct option long_options[] = {
   {"ms",     no_argument,       0,  'm' },
   {"os",     no_argument,       0,  'o' },
   {"OS",     required_argument, 0,  'f' },
+  {"MS",     required_argument, 0,  'g' },
   {"script", required_argument, 0,  's' },
   {0,        0,                 0,   0  }
 };
@@ -793,14 +794,18 @@ int process_args(int argc, char **argv) {
             break;
           case 'm': 
             load_os2nd = 1;
-            osfilename = "os.o";
+            osfilename = "chaos.o";
             break;
           case 'o': 
             load_os = 1;
-            osfilename = "os_lite.o";
+            osfilename = "os.o";
             break;
           case 'f': 
             load_os = 1;
+            osfilename = optarg; 
+            break;
+          case 'g': 
+            load_os2nd = 1;
             osfilename = optarg; 
             break;
           case 's':
@@ -812,9 +817,14 @@ int process_args(int argc, char **argv) {
             return -1;
         }
     }
+    if (load_os && load_os2nd) { // cant do both
+        printf("Invalid invocation.\n");
+        return -1;
+    }
+
     argc -= optind;
     argv += optind;
-    printres("load os: %d", load_os);
+    printres("load os: %d", load_os | load_os2nd);
     printres("os filename: %s", osfilename);
     printres(".o filename: %s", argv[0]);
     printres("scriptfilename: %s", scriptfilename);
