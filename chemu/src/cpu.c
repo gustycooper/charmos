@@ -398,6 +398,7 @@ enum stepret step() {
 /******************************************************************
  ***************************  EXECUTE  ****************************
  ** Each case of the switch statements perform execute           **
+ ** NOTE: PC_REL is converted to BASE_OFF by chasm               **
  ******************************************************************/
     switch (opcode) {
       case LDR: case LDB: case STR: case STB: // ldr, ldb, str, stb
@@ -436,6 +437,12 @@ enum stepret step() {
           case POSTINC_REG:
             address = registers[d->rm];
             registers[d->rm] += registers[d->rn];
+            break;
+          case BASE_REG_SHIFT:
+            if (d->immediate12 >= 0)
+                address = registers[d->rm] + (registers[d->rn] << d->immediate12);
+            else
+                address = registers[d->rm] + (registers[d->rn] >> (-d->immediate12));
             break;
           default:
             printf("bad ldrstr\n");

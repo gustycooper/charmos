@@ -5,6 +5,7 @@ typedef struct {
     int rn;
     int flag;
     int address;
+    int immediate12;
     int immediate16;
     int immediate20;
     int offset;

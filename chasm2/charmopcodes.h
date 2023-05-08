@@ -16,12 +16,14 @@ enum charmopcode {
 // Lower 4 bits of load/store opcodes
     ADDR = 0x0,          // load/store addr
     BASE = 0x1,          // load/store [r]
-    BASE_OFF = 0x2,      // load/store [r, imm]
-    BASE_REG = 0x3,      // load/store [r, imm]
+    BASE_OFF = 0x2,      // load/store [r,imm]
+    BASE_REG = 0x3,      // load/store [r,r]
     PREINC_OFF = 0x4,    // load/store [r,imm]!
     PREINC_REG = 0x5,    // load/store [r,r]!
     POSTINC_OFF = 0x6,   // load/store [r],r
     POSTINC_REG = 0x7,   // load/store [r],r
+    BASE_REG_SHIFT = 0x8,// load/store [r,r,imm]
+    PC_REL = 0x9,        // load/store !addr
 // Upper 4 bits of arithmetic/logic opcodes
     ADD_RD_RM_RN = 0x5,  // inst is add r3, r4, r5
     ADD_RD_RM_IMM = 0x6, // inst is add r3, r4, 5

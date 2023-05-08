@@ -23,7 +23,8 @@ char *insts[] = {
 /* 0x15 */  "ldr rd, [rm, rm]!",
 /* 0x16 */  "ldr rd, [rm], #imm",
 /* 0x17 */  "ldr rd, [rm], rn",
-            0,0,0,0,0,0,0,0, // opcodes 0x18-0x1f not used
+/* 0x18 */  "ldr rd, [rm, rn, #imm]",
+            0,0,0,0,0,0,0, // opcodes 0x18-0x1f not used
 /* 0x20 */  "ldb rd, address",
 /* 0x21 */  "ldb rd, [rm]",
 /* 0x22 */  "ldb rd, [rm, #imm]",
@@ -203,6 +204,9 @@ char *disassemble(unsigned int inst) {
           case POSTINC_REG:
             sprintf(buf, "[r%d], r%d", d->rm, d->rn);
             break;
+          case BASE_REG_SHIFT:
+            sprintf(buf, "[r%d, r%d, #%d]", d->rm, d->rn, d->immediate12);
+            break;
           default:
             sprintf(buf, "bad ldrstr");
             
@@ -270,12 +274,16 @@ decoded *decode(unsigned int inst) {
     d->address = inst & 0xfffff;
     int a = inst & 0xfffff;
     a <<= 12;  // convert to signed 32-bit value, shift left by 8
-    a /= 4096; // shift right by 8 and propagate sign bit (>> may be logical)
+    a /= 4096; // shift right by 12 (2**12 is 4096) and propagate sign bit (>> may be logical)
     d->immediate20 = a;
     a = inst & 0xffff;
     a <<= 16;   // convert to signed 32-bit value, shift left by 16
-    a /= 65536; // shift right by 16 and propagate sign bit (>> may be logical)
+    a /= 65536; // shift right by 16 (2**16 is 65536) and propagate sign bit (>> may be logical)
     d->immediate16 = a;
+    a = inst & 0xfff;
+    a <<= 20;   // convert to signed 32-bit value, shift left by 20
+    a /= 1048576; // shift right by 20 (2**20 is 1048576) and propagate sign bit (>> may be logical)
+    d->immediate12 = a;
     d->offset = inst >> 8 & 0xff;
 
     if (insts[d->opcode] == 0) {

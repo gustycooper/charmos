@@ -498,6 +498,19 @@ void generatecode() {
                     rn = toks[i].toks[7].tokv;
                     instr = opcode << 24 | rd << 20 | rm << 16 | rn << 12;
                     break;
+                case BASE_REG_SHIFT: // ldr rd, [rm, rn, #3]
+                    rm = toks[i].toks[4].tokv;
+                    rn = toks[i].toks[6].tokv;
+                    imm = toks[i].toks[8].tokv & 0xfff;
+                    instr = opcode << 24 | rd << 20 | rm << 16 | rn << 12 | imm;
+                    break;
+                case PC_REL: // ldr rd, !id
+                    // TODO: error if distance between tokv and address is > 32767 (16 bit imm)
+                    opcode = (opcode & 0xf0) | 0x2;  // make this is ldr rd, [r15, imm]
+                    rm = 15;
+                    imm = (toks[i].toks[4].tokv - toks[i].address) & 0xffff;
+                    instr = opcode << 24 | rd << 20 | rm << 16 | imm;
+                    break;
                 default:
                     instr = -1;
                     break;
